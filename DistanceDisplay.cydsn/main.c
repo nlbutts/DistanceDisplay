@@ -9,6 +9,9 @@
  *
  * ========================================
 */
+
+#include <stdint.h>
+#include <stdio.h>
 #include "project.h"
 #include "SharpLS013B4DN04.h"
 
@@ -22,6 +25,8 @@ uint8_t spiWriteComplete()
 
 int main(void)
 {
+    uint16_t distance = 100;
+    char str[100];
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
@@ -37,23 +42,22 @@ int main(void)
 
     SharpLS013B4DN04_DriverInit(&cfg);
 
-    const char str[] = "Blah";
-    //Graphics_drawString(&g_SharpLS013B4DN04_Driver, str, strlen(str), 10, 10, 1);
-    g_SharpLS013B4DN04_Driver.callLineDrawH(NULL, 0, 50, 0, 1);
-    g_SharpLS013B4DN04_Driver.callLineDrawH(NULL, 0, 50, 1, 1);
-    g_SharpLS013B4DN04_Driver.callLineDrawH(NULL, 0, 50, 2, 1);
-    g_SharpLS013B4DN04_Driver.callLineDrawH(NULL, 0, 50, 3, 1);
-    g_SharpLS013B4DN04_Driver.callPixelDraw(NULL, 0, 0, 1);
-    g_SharpLS013B4DN04_Driver.callPixelDraw(NULL, 1, 0, 1);
-    g_SharpLS013B4DN04_Driver.callPixelDraw(NULL, 2, 0, 1);
-    g_SharpLS013B4DN04_Driver.callPixelDraw(NULL, 3, 0, 1);
-
-    SharpLS013B4DN04_FlushBufferToLCD();
+    Graphics_Context ctx;
+    Graphics_initContext(&ctx, &g_SharpLS013B4DN04_Driver);
+    Graphics_setFont(&ctx, &g_sFontCmss24);
+    Graphics_setForegroundColor(&ctx, 0xFFFFFF);
+    Graphics_setBackgroundColor(&ctx, 0);
 
     for(;;)
     {
+        strcpy(str, "Distance: ");
+        Graphics_drawString(&ctx, str, strlen(str), 0, 0, 1);
+        snprintf(str, 100, "%03d mm", distance);
+        Graphics_drawString(&ctx, str, strlen(str), 0, 40, 1);
+        distance++;
+        SharpLS013B4DN04_FlushBufferToLCD();
         SharpLS013B4DN04_toggleVCOM();
-        CyDelay(500);
+        CyDelay(100);
     }
 }
 

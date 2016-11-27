@@ -177,6 +177,7 @@ void SharpLS013B4DN04_FlushBufferToLCD()
     uint8_t command;
     uint8_t line = 0;
     uint8_t zero[2] = {0};
+    uint8_t lcdBuf[16];
 
     Config.LCD_CS(1);
     Config.DELAYUS(150);
@@ -185,16 +186,15 @@ void SharpLS013B4DN04_FlushBufferToLCD()
     command = 0x80 | getVCOM();
     Config.WRITE(&command, 1);
 
-    Config.DELAYUS(100);
-
     // Write the lines
     while (line < LCD_Y_SIZE)
     {
-        uint8_t lineAddr = swap(line++);
+        uint8_t lineAddr = swap(line);
         Config.WRITE(&lineAddr, 1);
-        Config.WRITE(&SharpLS013B4DN04_Memory[line*LCD_Y_SIZE], LCD_Y_SIZE/8 + 1);
+        Config.WRITE(&SharpLS013B4DN04_Memory[(line*LCD_Y_SIZE)/8], LCD_Y_SIZE/8 + 1);
         while (!Config.TXCOMPLETE()) {};
         Config.DELAYUS(100);
+        line++;
     }
 
     // One extra byte
