@@ -177,7 +177,6 @@ void SharpLS013B4DN04_FlushBufferToLCD()
     uint8_t command;
     uint8_t line = 0;
     uint8_t zero[2] = {0};
-    uint8_t lcdBuf[16];
 
     Config.LCD_CS(1);
     Config.DELAYUS(150);
@@ -601,9 +600,10 @@ Template_DriverClearScreen(void *pvDisplayData,
     // This fills the entire display to clear it
     // Some LCD drivers support a simple command to clear the display
     int16_t y0 = 0;
-    while(y0++ <= (LCD_Y_SIZE - 1))
+    while(y0 <= (LCD_Y_SIZE - 1))
     {
         Template_DriverLineDrawH(pvDisplayData, 0, LCD_X_SIZE - 1, y0, ulValue);
+        y0++;
     }
 }
 
